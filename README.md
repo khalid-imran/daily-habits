@@ -60,6 +60,38 @@ This creates a static site in `dist/` — host it anywhere (Netlify, Vercel, Git
 
 > Note for Laragon users: the dev server is Node-based (`npm run dev`), it does not run through Apache. Only the built `dist/` folder is plain static files.
 
+## Deploy to Netlify
+
+A `netlify.toml` is already included (build command, publish folder, SPA redirect). Pick one of three ways:
+
+### A. Netlify CLI — quickest, no git needed
+
+```bash
+npm run build
+npx netlify-cli deploy --prod --dir dist
+```
+
+The first run opens your browser to log in to Netlify and asks you to create a new project — accept the defaults. Your Supabase keys from `.env` are baked into the build, so nothing else to configure. To ship an update later, run the same two commands again.
+
+### B. GitHub + Netlify — auto-deploys every push
+
+1. Push this folder to a GitHub repository (`.env` is gitignored and stays private).
+2. In Netlify: **Add new project → Import an existing project → GitHub**, pick the repo. Build settings are auto-detected from `netlify.toml`.
+3. Before deploying, add your two keys under **Site configuration → Environment variables** (Netlify builds can't see your local `.env`):
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. Deploy. Every future `git push` redeploys automatically.
+
+### C. Drag & drop
+
+Run `npm run build`, then drag the `dist` folder onto [app.netlify.com/drop](https://app.netlify.com/drop).
+
+### After the first deploy
+
+- In Supabase, set **Authentication → URL Configuration → Site URL** to your Netlify URL (e.g. `https://your-site.netlify.app`) so links in auth emails point to the live site.
+- It's normal (and safe) that the anon key is visible in the deployed bundle — it's a public key; row-level security protects the data.
+- Optional: rename the site in Netlify (**Site configuration → Change site name**) to get a nicer `*.netlify.app` URL.
+
 ## Project structure
 
 ```
