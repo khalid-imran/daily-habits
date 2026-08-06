@@ -261,20 +261,42 @@ textarea:focus {
 }
 
 .habit-table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 0 auto;
 }
 
 .habit-table th,
 .habit-table td {
-  border: 1px solid var(--border-soft);
+  border: 0;
   text-align: center;
   padding: 0;
 }
 
-.habit-table thead th {
-  border: 1px solid transparent;
+/* body cells draw the grid (right + bottom, top on first row, left on first column) */
+.habit-table tbody td.cell,
+.habit-table tbody td.habit-name {
+  border-right: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
+}
+
+.habit-table tbody tr:first-child td.cell,
+.habit-table tbody tr:first-child td.habit-name {
+  border-top: 1px solid var(--border-soft);
+}
+
+.habit-table tbody td.habit-name {
+  border-left: 1px solid var(--border-soft);
+}
+
+/* habit names stay visible while the days scroll on small screens */
+.habit-table th.corner,
+.habit-table td.habit-name {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--bg);
+  box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.12);
 }
 
 th.corner {
@@ -366,14 +388,18 @@ td.cell.future:hover {
   background: transparent;
 }
 
-td.cell.today,
-td.habit-row th.today {
+td.cell.today {
   border-left: 1.5px solid var(--today);
   border-right: 1.5px solid var(--today);
 }
 
 tr:last-child td.cell.today {
   border-bottom: 1.5px solid var(--today);
+}
+
+/* avoid a double edge where the previous cell meets today's column */
+.habit-table tbody td:has(+ td.cell.today) {
+  border-right: 0;
 }
 
 td.goal-cell {
@@ -423,6 +449,159 @@ td.achieved-cell {
   color: var(--text-soft);
   padding: 60px 20px;
   font-size: 14px;
+}
+
+/* ---------- view toggle (Day / Month) ---------- */
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 6px;
+}
+
+.view-toggle button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 20px;
+}
+
+.view-toggle button:first-child {
+  border-radius: 20px 0 0 20px;
+  border-right: 0;
+}
+
+.view-toggle button:last-child {
+  border-radius: 0 20px 20px 0;
+}
+
+.view-toggle button.on {
+  background: var(--btn-dark-bg);
+  color: var(--btn-dark-text);
+  border-color: var(--btn-dark-bg);
+}
+
+/* ---------- day view (phones) ---------- */
+.dayview {
+  max-width: 480px;
+  margin: 8px auto 0;
+  padding: 0 16px;
+}
+
+.dayview-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.dayview-label {
+  text-align: center;
+}
+
+.dayview-label b {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dayview-label span {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.dayview-today-link {
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.dayview-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin: 10px 2px 14px;
+}
+
+.dayview-progress .month-bar {
+  flex: 1;
+  margin-top: 0;
+}
+
+.dayview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.dayrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 14px;
+  font-size: 14.5px;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.06s ease, background 0.15s ease;
+}
+
+.dayrow:active {
+  transform: scale(0.985);
+}
+
+.dayrow.checked {
+  background: var(--hover);
+}
+
+.dayrow-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.check-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--check-mark);
+  flex-shrink: 0;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.dayview-note {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-align: left;
+  color: var(--text);
+  font-size: 13.5px;
+}
+
+.dayview-note .note-date {
+  display: block;
+}
+
+.dayview-note .note-content {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.dayview-note-empty {
+  color: var(--text-soft);
 }
 
 /* ---------- notes ---------- */
@@ -860,9 +1039,20 @@ td.achieved-cell {
   font-size: 13.5px;
 }
 
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 @media (max-width: 700px) {
   .topbar {
     padding: 12px 14px;
+  }
+
+  .user-menu-btn .user-email {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .grid-wrap {
@@ -876,5 +1066,13 @@ td.achieved-cell {
   .notes-title {
     margin-left: 0;
     text-align: left;
+  }
+
+  .new-habit-row {
+    text-align: center;
+  }
+
+  .notes-section {
+    margin-top: 32px;
   }
 }

@@ -51,7 +51,7 @@ export default function Header({
           {theme === 'light' ? <MoonIcon /> : <SunIcon />}
         </button>
         <button className="user-menu-btn" onClick={() => setOpen((o) => !o)}>
-          {email} <CaretDown />
+          <span className="user-email">{email}</span> <CaretDown />
         </button>
 
         {open && (

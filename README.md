@@ -92,6 +92,25 @@ Run `npm run build`, then drag the `dist` folder onto [app.netlify.com/drop](htt
 - It's normal (and safe) that the anon key is visible in the deployed bundle — it's a public key; row-level security protects the data.
 - Optional: rename the site in Netlify (**Site configuration → Change site name**) to get a nicer `*.netlify.app` URL.
 
+## Use it on your phone (Android)
+
+The app is a full PWA (Progressive Web App) with icons, offline shell, and a phone-optimized day view:
+
+1. Deploy the latest code (git push if you use Netlify auto-deploy).
+2. On your phone, open your Netlify URL in Chrome.
+3. Tap the **⋮ menu → "Add to Home screen" → Install**.
+
+It installs with the green check icon, opens full-screen without any browser bars, stays logged in, and phones automatically get a one-day checklist view (the Day/Month toggle switches layouts anytime).
+
+### Want a real APK file?
+
+Use [PWABuilder](https://www.pwabuilder.com) (free, by Microsoft). It wraps your deployed PWA into a signed Android package on their servers — no Android SDK needed:
+
+1. Go to **pwabuilder.com**, enter your Netlify URL, and let it scan.
+2. Click **Package for Stores → Android**. For sideloading on your own phone, download the package — the zip contains `app-release-signed.apk` (plus signing key files: keep them safe in case you ever publish to the Play Store).
+3. In the zip there's also an `assetlinks.json`. Copy it to `public/.well-known/assetlinks.json` in this project and push — after the redeploy, the installed APK loses the browser address bar and looks fully native.
+4. Send the APK to your phone and open it to install (allow "Install unknown apps" when prompted).
+
 ## Project structure
 
 ```

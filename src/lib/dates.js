@@ -36,3 +36,13 @@ export function prettyDate(s) {
   const [y, m, d] = s.split('-').map(Number)
   return `${d} ${MONTHS[m - 1]} ${y}`
 }
+
+const WEEKDAYS = [
+  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+]
+
+/** 'YYYY-MM-DD' -> 'Thursday' */
+export function weekdayName(s) {
+  const [y, m, d] = s.split('-').map(Number)
+  return WEEKDAYS[new Date(y, m - 1, d).getDay()]
+}

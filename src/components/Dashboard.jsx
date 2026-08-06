@@ -4,6 +4,7 @@ import { computeStreaks } from '../lib/streaks'
 import Header from './Header'
 import MonthNav from './MonthNav'
 import HabitGrid from './HabitGrid'
+import DayView from './DayView'
 import HabitModal from './HabitModal'
 import ManageHabits from './ManageHabits'
 import StatsModal from './StatsModal'
@@ -24,6 +25,15 @@ export default function Dashboard({ session, theme, onToggleTheme }) {
     const n = new Date()
     return { y: n.getFullYear(), m: n.getMonth() }
   })
+
+  // phones start on the compact day view, larger screens on the month grid
+  const [view, setView] = useState(() =>
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(max-width: 640px)').matches
+      ? 'day'
+      : 'month'
+  )
 
   const [habitModal, setHabitModal] = useState(null) // null | { habit: object|null }
   const [manageOpen, setManageOpen] = useState(false)
@@ -306,32 +316,61 @@ export default function Dashboard({ session, theme, onToggleTheme }) {
         onSignOut={() => supabase.auth.signOut()}
       />
 
-      <div className="month-nav-wrap">
-        <MonthNav
-          y={month.y}
-          m={month.m}
-          onPrev={prevMonth}
-          onNext={nextMonth}
-          onToday={goToday}
-          isCurrent={isCurrentMonth}
-        />
+      <div className="view-toggle">
+        <button
+          className={view === 'day' ? 'on' : ''}
+          onClick={() => setView('day')}
+        >
+          Day
+        </button>
+        <button
+          className={view === 'month' ? 'on' : ''}
+          onClick={() => setView('month')}
+        >
+          Month
+        </button>
       </div>
+
+      {view === 'month' && (
+        <div className="month-nav-wrap">
+          <MonthNav
+            y={month.y}
+            m={month.m}
+            onPrev={prevMonth}
+            onNext={nextMonth}
+            onToday={goToday}
+            isCurrent={isCurrentMonth}
+          />
+        </div>
+      )}
 
       {loading ? (
         <div className="page-loading">Loading your habits…</div>
       ) : (
         <>
-          <HabitGrid
-            habits={activeHabits}
-            y={month.y}
-            m={month.m}
-            checkins={checkins}
-            streaks={streaks}
-            monthCounts={monthCounts}
-            onToggle={toggleCheckin}
-            onEditHabit={(habit) => setHabitModal({ habit })}
-            keyOf={keyOf}
-          />
+          {view === 'month' ? (
+            <HabitGrid
+              habits={activeHabits}
+              y={month.y}
+              m={month.m}
+              checkins={checkins}
+              streaks={streaks}
+              monthCounts={monthCounts}
+              onToggle={toggleCheckin}
+              onEditHabit={(habit) => setHabitModal({ habit })}
+              keyOf={keyOf}
+            />
+          ) : (
+            <DayView
+              habits={activeHabits}
+              checkins={checkins}
+              keyOf={keyOf}
+              onToggle={toggleCheckin}
+              streaks={streaks}
+              notes={notes}
+              onOpenNote={(day) => setNoteModal({ day })}
+            />
+          )}
 
           <div className="new-habit-row">
             <button className="btn" onClick={() => setHabitModal({ habit: null })}>
